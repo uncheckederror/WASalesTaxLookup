@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using WASalesTax.Ingest;
+using WASalesTax.Parsing;
 
 namespace WASalesTax
 {
@@ -32,17 +33,30 @@ namespace WASalesTax
 
             try
             {
+                // Figure out the current period and the filename for the source data.
+                var period = new Period(DateTime.Now);
+                var stateFile = $"State_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
+                var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString().Substring(2)}C";
+                var rateBaseFile = $"Rates_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
+
                 using var db = new WashingtonStateContext();
                 await db.Database.EnsureCreatedAsync();
 
-                var checkForData = db.TaxRates.ToList();
+                var checkForData = db.TaxRates.FirstOrDefault();
 
-                if (checkForData is null || !checkForData.Any())
+                // If there is no data in the database or the data is expired.
+                if (checkForData is null || checkForData.ExpirationDate < DateTime.Now)
                 {
+                    // Delete the existing database if it exists and then recreate it.
+                    await db.Database.EnsureDeletedAsync();
+                    await db.Database.EnsureCreatedAsync();
+
                     // Ingest the data into the SQLite database.
-                    var checkRates = await DataSource.TryIngestTaxRatesAsync(config.GetConnectionString("TaxRateDataUrl")).ConfigureAwait(false);
-                    var checkZip = await DataSource.TryIngestShortZipCodesAsync(config.GetConnectionString("ShortZipDataUrl")).ConfigureAwait(false);
-                    var checkAddresses = await DataSource.TryIngestAddressesAsync(config.GetConnectionString("AddressDataUrl")).ConfigureAwait(false);
+                    var baseUrl = config.GetConnectionString("BaseDataUrl");
+
+                    var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip").ConfigureAwait(false);
+                    var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip").ConfigureAwait(false);
+                    var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip").ConfigureAwait(false);
                 }
 
                 // Start up the REST API.

@@ -6,14 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using WaRateFiles;
-using WaRateFiles.Locators.AddressNormal;
-using WaRateFiles.Standardizer;
-using WaRateFiles.Support;
-
 using WASalesTax.Models;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using WASalesTax.Parsing;
 
 namespace WASalesTax.Controllers
 {
@@ -45,6 +39,7 @@ namespace WASalesTax.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ContentResult> LegacyLookupAsync(string output, string addr, string city, string zip)
         {
+            // Using a contentresult here because we want to return Xml without using the built in XML serializer so that we have complete control over the format and content of the response.
             var response = new ContentResult();
 
             bool useXml = false;
@@ -65,10 +60,12 @@ namespace WASalesTax.Controllers
 
             zip = zip.Trim();
 
+            // Fail fast on invalid zip codes.
             if (!string.IsNullOrWhiteSpace(zip) && (zip.Length == 5 || zip.Length == 9 || zip.Length == 10))
             {
                 ShortZip matchingZip;
 
+                // Find a representitive zip code entry as a starting place.
                 switch (zip.Length)
                 {
                     case 5:
@@ -86,6 +83,7 @@ namespace WASalesTax.Controllers
                         break;
                 }
 
+                // If no zip code if found return an invalid response.
                 if (matchingZip is null)
                 {
                     if (useXml)
@@ -147,6 +145,7 @@ namespace WASalesTax.Controllers
                         relatedAddressRanges = await _context.AddressRanges.Where(x => x.ZipCode == matchingZip.Zip).ToListAsync();
                     }
 
+                    // Fail fast if no address ranges for this zip can be found.
                     if (relatedAddressRanges is null || !relatedAddressRanges.Any())
                     {
                         if (useXml)
@@ -161,6 +160,7 @@ namespace WASalesTax.Controllers
                     }
                     else
                     {
+                        // Parse the street address and find a similar address range.
                         var parsedStreetAddress = new AddressLineTokenizer(addr);
 
                         if (!string.IsNullOrWhiteSpace(parsedStreetAddress.Street.Lexum))
@@ -169,14 +169,17 @@ namespace WASalesTax.Controllers
                             double score = -3;
                             double mscore;
 
+                            // Score the potential matches and select the highest rated.
                             foreach (var canidate in relatedAddressRanges)
                             {
-                                if ((mscore = StreetComponent.Match(parsedStreetAddress, canidate)) > score)
+                                if ((mscore = parsedStreetAddress.Match(canidate)) > score)
                                 {
                                     match = canidate;
                                     score = mscore;
                                 }
                             }
+
+                            // If the score is to low or no match is found fail out.
                             if (null == match || score < -0.1)
                             {
                                 if (useXml)
@@ -191,6 +194,7 @@ namespace WASalesTax.Controllers
                             }
                             else
                             {
+                                // Return the tax rate for the matching address range.
                                 var rate = await _context.TaxRates.Where(x => x.LocationCode == match.LocationCode).FirstOrDefaultAsync();
 
                                 if (useXml)
@@ -309,7 +313,7 @@ namespace WASalesTax.Controllers
 
                             foreach (var canidate in relatedAddressRanges)
                             {
-                                if ((mscore = StreetComponent.Match(parsedStreetAddress, canidate)) > score)
+                                if ((mscore = parsedStreetAddress.Match(canidate)) > score)
                                 {
                                     match = canidate;
                                     score = mscore;
