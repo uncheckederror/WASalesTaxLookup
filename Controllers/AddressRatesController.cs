@@ -239,7 +239,7 @@ namespace WASalesTax.Controllers
         [HttpGet("AddressRates")]
         [ProducesResponseType(typeof(TaxRate), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ModernLookupAsync(string addr, string zip)
+        public async Task<IActionResult> ModernizedLookupAsync(string addr, string zip)
         {
             if (!string.IsNullOrWhiteSpace(zip) && (zip.Length == 5 || zip.Length == 9 || zip.Length == 10))
             {
@@ -338,6 +338,68 @@ namespace WASalesTax.Controllers
             else
             {
                 return BadRequest(new ProblemDetails { Status = 400, Detail = "Invalid ZIP Code. Please verify that the Zip code you submitted is real and formatted correctly.", Title = "Invalid ZIP Code" });
+            }
+        }
+
+        /// <summary>
+        /// Find a sale tax rate in Washington State.
+        /// </summary>
+        /// <param name="houseNumber">The leading number in the street address (ex. 6500 in the address "6500 Linderson Way SW")</param>
+        /// <param name="streetName"> The name of the street. (ex. "Linderson Way SW" in "6500 Linderson Way SW") Do not include the house number or the unit/suite/apt number.</param>
+        /// <param name="shortZipCode"> The 5 digit Zip Code. (ex. "98501")</param>
+        /// <param name="zipPlus4"> Plus4 Zip Codes are optional. (ex. "6561" from the complete zip code "98501-6561") </param>
+        /// <response code="200">Returns a tax rate.</response>
+        /// <response code="400">Returns a string discribing an invalid request.</response>
+        [Produces("application/json")]
+        [HttpGet("PreciseRate")]
+        [ProducesResponseType(typeof(TaxRate), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PreciseLookupAsync(int houseNumber, string streetName, string shortZipCode, string zipPlus4)
+        {
+            if (string.IsNullOrWhiteSpace(shortZipCode))
+            {
+                return BadRequest("No zip code provided.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(zipPlus4))
+            {
+                var result = await _context.AddressRanges.Where(x => x.ZipCode == shortZipCode && x.ZipCodePlus4 == zipPlus4).FirstOrDefaultAsync();
+
+                var rate = await _context.TaxRates.Where(x => x.LocationCode == result.LocationCode).FirstOrDefaultAsync();
+
+                return Ok(rate);
+            }
+
+            if (string.IsNullOrWhiteSpace(streetName))
+            {
+                return BadRequest("No street name provided.");
+            }
+            else
+            {
+                streetName = streetName.Trim().ToUpperInvariant();
+
+                var canidates = await _context.AddressRanges.Where(x => (x.Street == streetName) && (x.ZipCode == shortZipCode)).ToListAsync();
+
+                foreach (var canidate in canidates)
+                {
+                    if (canidate.AddressRangeUpperBound is null || canidate.AddressRangeLowerBound is null)
+                    {
+                        // Skip this canidate.
+                        continue;
+                    }
+
+                    var high = canidate.AddressRangeUpperBound ?? 0;
+                    var low = canidate.AddressRangeLowerBound ?? 0;
+
+                    if (high >= houseNumber && low <= houseNumber)
+                    {
+                        var rate = await _context.TaxRates.Where(x => x.LocationCode == canidate.LocationCode).FirstOrDefaultAsync();
+
+                        return Ok(rate);
+                    }
+                }
+
+                return BadRequest("Could not locate this street name and house number.");
             }
         }
     }
