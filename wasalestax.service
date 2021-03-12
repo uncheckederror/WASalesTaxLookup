@@ -1,0 +1,10 @@
+[Unit]
+Description=WASalesTax
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/WASalesTax
+ExecStart=/usr/bin/dotnet /var/www/WASalesTax.dll
+
+[Install]
+WantedBy=multi-user.target
