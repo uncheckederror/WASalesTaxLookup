@@ -69,6 +69,8 @@ namespace WASalesTax
                 app.UseForwardedHeaders();
             }
 
+            app.UseForwardedHeaders();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -76,7 +78,6 @@ namespace WASalesTax
             });
 
             app.UseHttpsRedirection();
-            app.UseForwardedHeaders();
             app.UseSecurityHeaders();
 
             app.UseRouting();
