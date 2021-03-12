@@ -47,6 +47,9 @@ namespace WASalesTax
                 // If there is no data in the database or the data is expired.
                 if (checkForData is null || checkForData.ExpirationDate < DateTime.Now)
                 {
+                    Log.Information("Ingesting data from the State of Washington.");
+                    Log.Information("This may take some time. (ex. 10 minutes)");
+
                     // Delete the existing database if it exists and then recreate it.
                     await db.Database.EnsureDeletedAsync();
                     await db.Database.EnsureCreatedAsync();
@@ -57,6 +60,7 @@ namespace WASalesTax
                     var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip").ConfigureAwait(false);
                     var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip").ConfigureAwait(false);
                     var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip").ConfigureAwait(false);
+                    Log.Information("Data ingest complete.");
                 }
 
                 // Start up the REST API.
