@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,11 @@ namespace WASalesTax
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddXmlSerializerFormatters();
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
 
             services.AddDbContext<WashingtonStateContext>();
 
@@ -60,6 +66,7 @@ namespace WASalesTax
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseForwardedHeaders();
             }
 
             app.UseSwagger();
@@ -69,6 +76,7 @@ namespace WASalesTax
             });
 
             app.UseHttpsRedirection();
+            app.UseForwardedHeaders();
             app.UseSecurityHeaders();
 
             app.UseRouting();
