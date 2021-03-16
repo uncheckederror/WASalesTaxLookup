@@ -25,6 +25,7 @@ namespace WASalesTax
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("logWAStateSalesTax.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             var config = new ConfigurationBuilder()
