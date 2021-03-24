@@ -17,11 +17,16 @@ namespace WASaleTax.Tests
     {
         private readonly ITestOutputHelper output;
         private WashingtonStateContext db;
+        private IConfiguration configuration;
 
-        public Ingest(ITestOutputHelper output)
+        public Ingest(ITestOutputHelper output, IConfiguration config)
         {
             this.output = output;
-            db = new WashingtonStateContext();
+            var contextOptions = new DbContextOptionsBuilder<WashingtonStateContext>()
+                    .UseSqlite(config.GetConnectionString("WashingtonStateContext"))
+                    .Options;
+            db = new WashingtonStateContext(contextOptions);
+            configuration = config;
         }
 
         [Fact]
@@ -37,16 +42,12 @@ namespace WASaleTax.Tests
             await db.Database.EnsureDeletedAsync();
             await db.Database.EnsureCreatedAsync();
 
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false)
-                .Build();
-
             // Ingest the data into the SQLite database.
-            var baseUrl = config.GetConnectionString("BaseDataUrl");
+            var baseUrl = configuration.GetConnectionString("BaseDataUrl");
 
-            var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip").ConfigureAwait(false);
-            var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip").ConfigureAwait(false);
-            var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip").ConfigureAwait(false);
+            var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip", db).ConfigureAwait(false);
+            var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip", db).ConfigureAwait(false);
+            var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip", db).ConfigureAwait(false);
 
             Assert.True(checkRates);
             Assert.True(checkZip);

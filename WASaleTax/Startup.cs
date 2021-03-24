@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,7 +22,6 @@ namespace WASalesTax
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddXmlSerializerFormatters();
@@ -31,7 +31,10 @@ namespace WASalesTax
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
-            services.AddDbContext<WashingtonStateContext>();
+            services.AddDbContext<WashingtonStateContext>(options =>
+            {
+                options.UseSqlite(Configuration.GetConnectionString("WashingtonStateContext"));
+            });
 
             services.AddSwaggerGen(c =>
             {

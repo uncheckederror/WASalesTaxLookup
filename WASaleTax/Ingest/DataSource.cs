@@ -20,7 +20,7 @@ namespace WASalesTax.Ingest
     public class DataSource
     {
         private const int batchSize = 100;
-        public static async Task<bool> TryIngestAddressesAsync(string url)
+        public static async Task<bool> TryIngestAddressesAsync(string url, WashingtonStateContext db)
         {
             try
             {
@@ -32,7 +32,6 @@ namespace WASalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var db = new WashingtonStateContext();
                 db.ChangeTracker.AutoDetectChangesEnabled = false;
 
                 using (var reader = new StreamReader(pathToCSV))
@@ -65,7 +64,7 @@ namespace WASalesTax.Ingest
             }
         }
 
-        public static async Task<bool> TryIngestTaxRatesAsync(string url)
+        public static async Task<bool> TryIngestTaxRatesAsync(string url, WashingtonStateContext db)
         {
             try
             {
@@ -77,7 +76,6 @@ namespace WASalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var db = new WashingtonStateContext();
                 db.ChangeTracker.AutoDetectChangesEnabled = false;
 
                 using (var reader = new StreamReader(pathToCSV))
@@ -109,7 +107,7 @@ namespace WASalesTax.Ingest
             }
         }
 
-        public static async Task<bool> TryIngestShortZipCodesAsync(string url)
+        public static async Task<bool> TryIngestShortZipCodesAsync(string url, WashingtonStateContext db)
         {
             try
             {
@@ -133,7 +131,6 @@ namespace WASalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var db = new WashingtonStateContext();
                 db.ChangeTracker.AutoDetectChangesEnabled = false;
 
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
