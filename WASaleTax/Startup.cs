@@ -52,7 +52,7 @@ namespace WASalesTax
                     License = new OpenApiLicense
                     {
                         Name = "Use under LICX",
-                        Url = new Uri("https://example.com/license"),
+                        Url = new Uri("https://github.com/uncheckederror/WASalesTaxLookup/blob/master/LICENSE"),
                     }
                 });
 

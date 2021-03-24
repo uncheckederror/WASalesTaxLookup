@@ -19,9 +19,14 @@ namespace WASaleTax.Tests
         private WashingtonStateContext db;
         private IConfiguration configuration;
 
-        public Ingest(ITestOutputHelper output, IConfiguration config)
+        public Ingest(ITestOutputHelper output)
         {
             this.output = output;
+
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
             var contextOptions = new DbContextOptionsBuilder<WashingtonStateContext>()
                     .UseSqlite(config.GetConnectionString("WashingtonStateContext"))
                     .Options;
