@@ -75,9 +75,18 @@ namespace WASalesTax
             app.UseForwardedHeaders();
 
             app.UseSwagger();
+
+            // Swagger defaults
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "WASalesTax");
+            });
+
+            // Set the app root to the swagger docs
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WASalesTax");
+                c.RoutePrefix = string.Empty;
             });
 
             app.UseHttpsRedirection();
