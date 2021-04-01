@@ -37,7 +37,7 @@ namespace WASaleTax.Tests
         [Fact]
         public async Task IngestDataAsync()
         {
-            // Figure out the current period and the filename for the source data.
+            // Figure out the current period and the filename for the source data from the State.
             var period = new Period(DateTime.Now);
             var stateFile = $"State_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
             var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString().Substring(2)}C";
