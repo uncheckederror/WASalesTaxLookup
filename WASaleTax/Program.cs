@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,6 +48,22 @@ namespace WASalesTax
                 var stateFile = $"State_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
                 var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString().Substring(2)}C";
                 var rateBaseFile = $"Rates_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
+
+                var fileTypes = new string[] { ".txt", ".csv", ".zip" };
+                var fileNames = new string[] { stateFile, zipBaseFile, rateBaseFile };
+
+                // If a file with the same name already exists it will break the downloading process, so we need to make sure they are deleted.
+                foreach (var name in fileNames)
+                {
+                    foreach (var type in fileTypes)
+                    {
+                        var filePath = Path.Combine(AppContext.BaseDirectory, name, type);
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
+                }
 
                 // Put the ORM to work and make sure we have a database
                 using var db = new WashingtonStateContext(contextOptions);
