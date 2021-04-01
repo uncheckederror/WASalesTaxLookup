@@ -27,6 +27,17 @@ namespace WASalesTax.Ingest
                 var pathtoFile = await url.DownloadFileAsync(AppContext.BaseDirectory);
                 var pathToCSV = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile) + ".csv");
 
+                var fileTypes = new string[] { ".txt", ".csv" };
+                // If a file with the same name already exists it will break the downloading process, so we need to make sure they are deleted.
+                foreach (var type in fileTypes)
+                {
+                    var filePath = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile) + type);
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+
                 if (!File.Exists(pathToCSV))
                 {
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
@@ -70,6 +81,18 @@ namespace WASalesTax.Ingest
             {
                 var pathtoFile = await url.DownloadFileAsync(AppContext.BaseDirectory);
                 var pathToCSV = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile) + ".csv");
+
+                var fileTypes = new string[] { ".txt", ".csv" };
+                // If a file with the same name already exists it will break the downloading process, so we need to make sure they are deleted.
+                foreach (var type in fileTypes)
+                {
+                    var filePath = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile) + type);
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+
 
                 if (!File.Exists(pathToCSV))
                 {
