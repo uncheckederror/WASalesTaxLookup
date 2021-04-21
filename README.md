@@ -28,4 +28,4 @@ Read through our [Swagger docs](https://wataxlookup.acceleratenetworks.com/swagg
 * cd into the WASaleTax folder
 * Execute the "dotnet run" command
 * Use a browser navigate to the localhost URL provided in the shell window
-* Optionally view the Swagger by adding "/swagger" to the localhost URL
+* Optionally view the docs by adding "/swagger" to the localhost URL
