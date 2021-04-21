@@ -29,3 +29,6 @@ Read through our [Swagger docs](https://wataxlookup.acceleratenetworks.com/swagg
 * Execute the "dotnet run" command
 * Use a browser navigate to the localhost URL provided in the shell window
 * Optionally view the docs by adding "/swagger" to the localhost URL
+
+# Troubleshooting
+All of the data the app requires is ingested on start up. If the database has to be rebuilt from the state's data this may take a few minutes to complete (about 6 minutes and 1.3 GBs of memory consumed at maximum) once this process is complete the API is read to use. You can verify that everything is working correctly by executing a test request from the Swagger docs. 
