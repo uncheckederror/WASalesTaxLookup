@@ -16,8 +16,8 @@ namespace WASaleTax.Tests
     public class Ingest
     {
         private readonly ITestOutputHelper output;
-        private WashingtonStateContext db;
-        private IConfiguration configuration;
+        private readonly WashingtonStateContext db;
+        private readonly IConfiguration configuration;
 
         public Ingest(ITestOutputHelper output)
         {
@@ -39,9 +39,9 @@ namespace WASaleTax.Tests
         {
             // Figure out the current period and the filename for the source data from the State.
             var period = new Period(DateTime.Now);
-            var stateFile = $"State_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
-            var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString().Substring(2)}C";
-            var rateBaseFile = $"Rates_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
+            var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
+            var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
+            var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
 
             // Delete the existing database if it exists and then recreate it.
             await db.Database.EnsureDeletedAsync();

@@ -127,10 +127,10 @@ namespace WASalesTax.Parsing
 
         public override bool Equals(object obj)
         {
-            if (obj is Period)
+            if (obj is Period period)
             {
-                return ((Period)obj).PeriodNumber == PeriodNumber &&
-                    ((Period)obj).Year == Year;
+                return period.PeriodNumber == PeriodNumber &&
+                    period.Year == Year;
             }
             return false;
         }
@@ -183,7 +183,7 @@ namespace WASalesTax.Parsing
                 throw new FormatException("Frequency (first character) must be a Q.");
             }
             string snum = periodYear.Substring(1, 1);
-            string syear = periodYear.Substring(2);
+            string syear = periodYear[2..];
             if (!snum.IsNumeric())
             {
                 throw new FormatException(snum + " must be 1-4");

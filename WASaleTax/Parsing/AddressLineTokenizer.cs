@@ -118,13 +118,12 @@ namespace WASalesTax.Parsing
             m_sufdir = null;
             m_rawStreet = street;
 
-            LexTokenType token;
             Lex lexer = new(street);
 
             List<AddressToken> tokens = new();
             StringTable m_strtab = new();
 
-            while (lexer.NextToken(out token) && token != LexTokenType.ADDRLEX_EOF)
+            while (lexer.NextToken(out LexTokenType token) && token != LexTokenType.ADDRLEX_EOF)
             {
                 tokens.Add(new AddressToken(m_strtab.Get(lexer.Lexum), token));
             }
@@ -429,7 +428,7 @@ namespace WASalesTax.Parsing
 
             return score;
         }
-        private bool CombineWords(List<AddressToken> tokens, bool ignoreStreetType)
+        private static bool CombineWords(List<AddressToken> tokens, bool ignoreStreetType)
         {
             for (int x = 0; x < tokens.Count - 1; x++)
             {
@@ -480,17 +479,17 @@ namespace WASalesTax.Parsing
             return false;
         }
 
-        private bool FixUpRoadTypes(List<AddressToken> tokens)
+        private static bool FixUpRoadTypes(List<AddressToken> tokens)
         {
             int end = 0;
             bool tryit = false;
 
-            if (tokens[tokens.Count - 1].IsRoadType())
+            if (tokens[^1].IsRoadType())
             {
                 tryit = true;
                 end = tokens.Count - 2;
             }
-            else if (tokens.Count > 1 && tokens[tokens.Count - 1].IsDirectional() && tokens[tokens.Count - 2].IsRoadType())
+            else if (tokens.Count > 1 && tokens[^1].IsDirectional() && tokens[^2].IsRoadType())
             {
                 tryit = true;
                 end = tokens.Count - 3;
@@ -513,7 +512,7 @@ namespace WASalesTax.Parsing
             return false;
         }
 
-        private bool FixUpDirectionals(List<AddressToken> tokens)
+        private static bool FixUpDirectionals(List<AddressToken> tokens)
         {
             bool startsWithHouse = tokens[0].LexToken == LexTokenType.ADDRLEX_NUM;
             if ((startsWithHouse && tokens.Count < 4) || (!startsWithHouse && tokens.Count < 3))
@@ -542,7 +541,7 @@ namespace WASalesTax.Parsing
             return false;
         }
 
-        private bool DirectionalsCompatable(AddressToken t1, AddressToken t2)
+        private static bool DirectionalsCompatable(AddressToken t1, AddressToken t2)
         {
             if (t1.Lexum[0] == 'N' || t1.Lexum[0] == 'S')
             {
@@ -551,7 +550,7 @@ namespace WASalesTax.Parsing
             return false;
         }
 
-        private void CoalesceDirectionals(List<AddressToken> tokens)
+        private static void CoalesceDirectionals(List<AddressToken> tokens)
         {
             for (int x = 0; x < tokens.Count - 1; x++)
             {
@@ -879,7 +878,7 @@ namespace WASalesTax.Parsing
             return false;
         }
 
-        private bool IsStreetToken(LexTokenType token)
+        private static bool IsStreetToken(LexTokenType token)
         {
             return token == LexTokenType.ADDRLEX_ALPHA ||
                 token == LexTokenType.ADDRLEX_NUM ||
@@ -887,7 +886,7 @@ namespace WASalesTax.Parsing
                 token == LexTokenType.ADDRLEX_ONECHAR;
         }
 
-        private bool IsHigwaySyn(AddressToken atok)
+        private static bool IsHigwaySyn(AddressToken atok)
         {
             return atok.Lexum == "USHY" ||
                 atok.Lexum == "STHY" ||

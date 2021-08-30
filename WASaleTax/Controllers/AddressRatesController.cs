@@ -118,7 +118,7 @@ namespace WASalesTax.Controllers
 
                     if (zip.Length == 9)
                     {
-                        var plus4 = zip.Substring(5);
+                        var plus4 = zip[5..];
                         relatedAddressRanges = await _context.AddressRanges.Where(x => x.ZipCode == matchingZip.Zip && x.ZipCodePlus4 == plus4).ToListAsync();
 
                         // Skip address parsing if there's only one matching address range for the 9 digit ZIP.
@@ -279,7 +279,7 @@ namespace WASalesTax.Controllers
 
                     if (zip.Length == 9)
                     {
-                        var plus4 = zip.Substring(5);
+                        var plus4 = zip[5..];
                         relatedAddressRanges = await _context.AddressRanges.Where(x => x.ZipCode == matchingZip.Zip && x.ZipCodePlus4 == plus4).ToListAsync();
 
                         // Skip address parsing if there's only one matching address range for the 9 digit ZIP.

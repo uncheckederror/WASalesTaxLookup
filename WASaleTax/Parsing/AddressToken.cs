@@ -26,12 +26,12 @@ namespace WASalesTax.Parsing
     /// </summary>
     public class AddressToken
     {
-        public static Lexicon NormalDirectionals = Lexicon.GetLexicon(Lexicon.LexiconNormalDirectional);
-        public static Lexicon Directionals = Lexicon.GetLexicon(Lexicon.LexiconDirectional);
-        public static Lexicon Roads = Lexicon.GetLexicon(Lexicon.LexiconCommonRoads);
-        public static Lexicon UncommonRoads = Lexicon.GetLexicon(Lexicon.LexiconUspsAbbr);
-        public static Lexicon Secondary = Lexicon.GetLexicon(Lexicon.LexiconSecondaryUnit);
-        public static Lexicon Ordinal = Lexicon.GetLexicon(Lexicon.LexiconOrdinalWord);
+        private static readonly Lexicon NormalDirectionals = Lexicon.GetLexicon(Lexicon.LexiconNormalDirectional);
+        private static readonly Lexicon Directionals = Lexicon.GetLexicon(Lexicon.LexiconDirectional);
+        private static readonly Lexicon Roads = Lexicon.GetLexicon(Lexicon.LexiconCommonRoads);
+        private static readonly Lexicon UncommonRoads = Lexicon.GetLexicon(Lexicon.LexiconUspsAbbr);
+        private static readonly Lexicon Secondary = Lexicon.GetLexicon(Lexicon.LexiconSecondaryUnit);
+        private static readonly Lexicon Ordinal = Lexicon.GetLexicon(Lexicon.LexiconOrdinalWord);
 
         public string Lexum { get; set; }
 
@@ -174,21 +174,13 @@ namespace WASalesTax.Parsing
 
         public void ToOrdinal()
         {
-            switch (Lexum[Lexum.Length - 1])
+            Lexum += Lexum[^1] switch
             {
-                case '1':
-                    Lexum += "ST";
-                    break;
-                case '2':
-                    Lexum += "ND";
-                    break;
-                case '3':
-                    Lexum += "RD";
-                    break;
-                default:
-                    Lexum += "TH";
-                    break;
-            }
+                '1' => "ST",
+                '2' => "ND",
+                '3' => "RD",
+                _ => "TH",
+            };
             LexToken = LexTokenType.ADDRLEX_ORDINAL;
         }
     }

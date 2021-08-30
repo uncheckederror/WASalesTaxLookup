@@ -7,7 +7,7 @@ namespace WASalesTax.Parsing
     /// </summary>
     public class Lexicon
     {
-        public Dictionary<string, string> dictionary = new Dictionary<string, string>();
+        public Dictionary<string, string> dictionary = new();
 
         public static Lexicon GetLexicon(string[] txt)
         {
@@ -30,7 +30,7 @@ namespace WASalesTax.Parsing
             return dictionary.ContainsKey(str);
         }
 
-        public static string[] LexiconNormalDirectional = new string[] {
+        public static readonly string[] LexiconNormalDirectional = new string[] {
             "N", "N",
             "W", "W",
             "S", "S",
@@ -41,7 +41,7 @@ namespace WASalesTax.Parsing
             "SE", "SE"
         };
 
-        public static string[] LexiconDirectional = new string[] {
+        public static readonly string[] LexiconDirectional = new string[] {
             "N", "N",
             "W", "W",
             "S", "S",
@@ -61,7 +61,7 @@ namespace WASalesTax.Parsing
             "SO", "S"
         };
 
-        public static string[] LexiconCommonRoads = new string[] {
+        public static readonly string[] LexiconCommonRoads = new string[] {
             "AV","AVE",
             "AVE","AVE",
             "AVENE","AVE",
@@ -159,7 +159,7 @@ namespace WASalesTax.Parsing
         };
 
 
-        public static string[] LexiconUspsAbbr = new string[] {
+        public static readonly string[] LexiconUspsAbbr = new string[] {
             "ALLEE","ALY",
             "ALLEY","ALY",
             "ALLY","ALY",
@@ -691,7 +691,7 @@ namespace WASalesTax.Parsing
             "WLS","WLS"
         };
 
-        public static string[] LexiconSecondaryUnit = new string[] {
+        public static readonly string[] LexiconSecondaryUnit = new string[] {
             "APARTMENT","APT",
             "APT","APT",
             "BASEMENT","BSMT",
@@ -733,7 +733,7 @@ namespace WASalesTax.Parsing
             "UPPR","UPPR"
         };
 
-        public static string[] LexiconOrdinalWord = new string[] {
+        public static readonly string[] LexiconOrdinalWord = new string[] {
             "FIRST", "1ST",
             "SECOND", "2ND",
             "THIRD", "3RD",

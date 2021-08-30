@@ -45,9 +45,9 @@ namespace WASalesTax
             {
                 // Figure out the current period and the filename for the source data from the State.
                 var period = new Period(DateTime.Now);
-                var stateFile = $"State_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
-                var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString().Substring(2)}C";
-                var rateBaseFile = $"Rates_{period.Year.ToString().Substring(2)}Q{period.PeriodNumber}";
+                var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
+                var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
+                var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
 
                 // Put the ORM to work and make sure we have a database
                 using var db = new WashingtonStateContext(contextOptions);

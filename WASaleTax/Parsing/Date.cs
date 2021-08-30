@@ -51,7 +51,7 @@ namespace WASalesTax.Parsing
             {
                 return true;
             }
-            if ((object)d1 == null || (object)d2 == null)
+            if (d1 is null || d2 is null)
             {
                 return false;
             }
@@ -66,9 +66,9 @@ namespace WASalesTax.Parsing
         /// <returns></returns>
         public static bool operator ==(Date d1, DateTime d2)
         {
-            if ((object)d1 == null)
+            if (d1 is null)
             {
-                return null == (object)d2;
+                return d2 == DateTime.MinValue;
             }
             return d1.Equals(d2);
         }
@@ -81,9 +81,9 @@ namespace WASalesTax.Parsing
         /// <returns></returns>
         public static bool operator !=(Date d1, Date d2)
         {
-            if (null == (object)d1)
+            if (d1 is null)
             {
-                return null != (object)d2;
+                return d2 is not null;
             }
             return !d1.Equals(d2);
         }
@@ -96,9 +96,9 @@ namespace WASalesTax.Parsing
         /// <returns></returns>
         public static bool operator !=(Date d1, DateTime d2)
         {
-            if (null == (object)d1)
+            if (d1 is null)
             {
-                return null != (object)d2;
+                return d2 == DateTime.MinValue;
             }
             return d1.Day != d2.Day || d1.Month != d2.Month || d1.Year != d2.Year;
         }

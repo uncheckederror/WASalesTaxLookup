@@ -6,7 +6,7 @@ namespace WASalesTax.Parsing
 {
     public class StringTable
     {
-        public Dictionary<int, List<string>> Strings = new Dictionary<int, List<string>>();
+        public Dictionary<int, List<string>> Strings = new();
 
         public string Get(StringBuilder sb)
         {
@@ -26,7 +26,7 @@ namespace WASalesTax.Parsing
             return str;
         }
 
-        private bool ListContains(List<string> lst, StringBuilder sb, ref string str)
+        private static bool ListContains(List<string> lst, StringBuilder sb, ref string str)
         {
             for (int x = 0; x < lst.Count; x++)
             {

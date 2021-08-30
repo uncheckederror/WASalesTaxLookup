@@ -83,7 +83,7 @@ namespace WASalesTax.Parsing
             {
                 return str;
             }
-            if (str[str.Length - 1] != ch)
+            if (str[^1] != ch)
             {
                 return str + ch.ToString();
             }
@@ -128,7 +128,7 @@ namespace WASalesTax.Parsing
 
         public static string MidStr(this string str, int start, int stop)
         {
-            return str.Substring(start, stop - start);
+            return str[start..stop];
         }
 
     }

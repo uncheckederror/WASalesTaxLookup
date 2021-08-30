@@ -39,7 +39,7 @@ namespace WASalesTax.Parsing
 
         public string Text;
         public int Position;
-        public StringBuilder Lexum = new StringBuilder();
+        public StringBuilder Lexum = new();
         public LexState State;
 
         void AppendLex(char ch)
