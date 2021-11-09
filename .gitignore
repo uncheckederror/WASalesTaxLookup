@@ -365,3 +365,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 *.txt
+/WASaleTax/washingtonstate.db-wal
+/WASaleTax/washingtonstate.db-shm
