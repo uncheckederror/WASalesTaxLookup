@@ -15,7 +15,7 @@ variables:
 steps:
 - task: UseDotNet@2
   inputs:
-    version: '5.0.x'
+    version: '6.0.x'
 
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
