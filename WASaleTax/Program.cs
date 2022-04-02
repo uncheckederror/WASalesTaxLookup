@@ -51,7 +51,7 @@ namespace WASalesTax
 
                 // Put the ORM to work and make sure we have a database
                 using var db = new WashingtonStateContext(contextOptions);
-                await db.Database.EnsureCreatedAsync();
+                await db.Database.MigrateAsync();
 
                 var checkForTaxRates = db.TaxRates.FirstOrDefault();
                 var checkForAddresses = db.AddressRanges.FirstOrDefault();
@@ -69,7 +69,7 @@ namespace WASalesTax
                     // Delete the existing database if it exists and then recreate it.
                     // Handles senarios where data was only partially ingests or has expired.
                     await db.Database.EnsureDeletedAsync();
-                    await db.Database.EnsureCreatedAsync();
+                    await db.Database.MigrateAsync();
 
                     // Ingest the data into the SQLite database.
                     var baseUrl = config.GetConnectionString("BaseDataUrl");
