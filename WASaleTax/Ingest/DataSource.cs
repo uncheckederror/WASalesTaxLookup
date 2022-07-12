@@ -163,7 +163,6 @@ namespace WASalesTax.Ingest
                     }
                 }
 
-
                 if (!File.Exists(pathToCSV))
                 {
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
