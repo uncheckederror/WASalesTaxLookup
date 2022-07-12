@@ -40,7 +40,7 @@ namespace WASaleTax.Tests
             // Figure out the current period and the filename for the source data from the State.
             var period = new Period(DateTime.Now);
             var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
-            var zipBaseFile = $"ZIP4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
+            var zipBaseFile = $"Zip4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
             var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
 
             // Delete the existing database if it exists and then recreate it.
