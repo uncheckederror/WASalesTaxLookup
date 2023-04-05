@@ -47,6 +47,7 @@ namespace WASalesTax
                 var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
                 var zipBaseFile = $"Zip4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
                 var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
+                var dateSegment = $"/{period.Year}-{period.Month:00}/";
 
                 // Put the ORM to work and make sure we have a database
                 using var db = new WashingtonStateContext(contextOptions);
@@ -73,13 +74,13 @@ namespace WASalesTax
                     // Ingest the data into the SQLite database.
                     var baseUrl = config.GetConnectionString("BaseDataUrl");
                     var checkRates = await DataSource
-                        .TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip", db)
+                        .TryIngestTaxRatesAsync($"{baseUrl}{dateSegment}{rateBaseFile}.zip", db)
                         .ConfigureAwait(false);
                     var checkZip = await DataSource
-                        .TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip", db)
+                        .TryIngestShortZipCodesAsync($"{baseUrl}{dateSegment}{zipBaseFile}.zip", db)
                         .ConfigureAwait(false);
                     var checkAddresses = await DataSource
-                        .TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip", db)
+                        .TryIngestAddressesAsync($"{baseUrl}{dateSegment}{stateFile}.zip", db)
                         .ConfigureAwait(false);
                     Log.Information("Data ingest complete.");
                 }
