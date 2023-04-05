@@ -42,6 +42,7 @@ namespace WASaleTax.Tests
             var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
             var zipBaseFile = $"Zip4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
             var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
+            var dateSegment = $"/{period.Year}-{period.Month:00}/";
 
             // Delete the existing database if it exists and then recreate it.
             await db.Database.EnsureDeletedAsync();
@@ -50,9 +51,9 @@ namespace WASaleTax.Tests
             // Ingest the data into the SQLite database.
             var baseUrl = configuration.GetConnectionString("BaseDataUrl");
 
-            var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{rateBaseFile}.zip", db).ConfigureAwait(false);
-            var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{zipBaseFile}.zip", db).ConfigureAwait(false);
-            var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{stateFile}.zip", db).ConfigureAwait(false);
+            var checkRates = await DataSource.TryIngestTaxRatesAsync($"{baseUrl}{dateSegment}{rateBaseFile}.zip", db).ConfigureAwait(false);
+            var checkZip = await DataSource.TryIngestShortZipCodesAsync($"{baseUrl}{dateSegment}{zipBaseFile}.zip", db).ConfigureAwait(false);
+            var checkAddresses = await DataSource.TryIngestAddressesAsync($"{baseUrl}{dateSegment}{stateFile}.zip", db).ConfigureAwait(false);
 
             Assert.True(checkRates);
             Assert.True(checkZip);

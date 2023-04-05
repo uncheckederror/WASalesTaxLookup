@@ -12,6 +12,7 @@ namespace WASalesTax.Parsing
 
         public int PeriodNumber { get; set; }
         public int Year { get; set; }
+        public int Month { get; set; }
         public string PeriodLit { get; set; }
         public int StartDateRevInt { get; set; }
 
@@ -24,21 +25,25 @@ namespace WASalesTax.Parsing
                 case 2:
                 case 3:
                     PeriodNumber = 1;
+                    Month = 12;
                     break;
                 case 4:
                 case 5:
                 case 6:
                     PeriodNumber = 2;
+                    Month = 03;
                     break;
                 case 7:
                 case 8:
                 case 9:
                     PeriodNumber = 3;
+                    Month = 06;
                     break;
                 case 10:
                 case 11:
                 case 12:
                     PeriodNumber = 4;
+                    Month = 09;
                     break;
             }
             PeriodLit = "Q" + PeriodNumber.ToString() + Year.ToString();
