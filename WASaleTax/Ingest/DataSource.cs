@@ -31,7 +31,7 @@ namespace WASalesTax.Ingest
                 }
 
                 var pathtoFile = await url.DownloadFileAsync(AppContext.BaseDirectory);
-                var pathToCSV = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile) + ".txt");
+                var pathToCSV = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(pathtoFile).TrimEnd(new char[] { '_', '0' }) + ".txt");
 
                 var fileTypes = new string[] { ".txt", ".csv" };
                 // If a file with the same name already exists it will break the downloading process, so we need to make sure they are deleted.

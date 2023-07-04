@@ -44,10 +44,10 @@ namespace WASalesTax
             {
                 // Figure out the current period and the filename for the source data from the State.
                 var period = new Period(DateTime.Now);
-                var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
+                var stateFile = $"State_{period.Year.ToString()[2..]}Q{period.PeriodNumber}_0";
                 var zipBaseFile = $"Zip4Q{period.PeriodNumber}{period.Year.ToString()[2..]}C";
                 var rateBaseFile = $"Rates_{period.Year.ToString()[2..]}Q{period.PeriodNumber}";
-                var dateSegment = $"/{period.Year}-{period.Month:00}/";
+                var dateSegment = $"/{period.Year}-{period.Month-1:00}/";
 
                 // Put the ORM to work and make sure we have a database
                 using var db = new WashingtonStateContext(contextOptions);
@@ -67,7 +67,7 @@ namespace WASalesTax
                     Log.Information("This may take some time. (ex. 10 minutes)");
 
                     // Delete the existing database if it exists and then recreate it.
-                    // Handles senarios where data was only partially ingests or has expired.
+                    // Handles scenarios where data was only partially ingests or has expired.
                     await db.Database.EnsureDeletedAsync();
                     await db.Database.MigrateAsync();
 
