@@ -14,7 +14,7 @@ This is a .NET 8 Web API app that exposes a REST API with friendly Swagger docum
 
 The data required to perform the sale tax rate lookups is downloaded from the [DOR's data download page](https://dor.wa.gov/taxes-rates/sales-and-use-tax-rates/downloadable-database) when you start the application up. Then its read into a SQLite 3 database, which is created and destroyed as needed, and lives in the root directory of the app. This first time startup process can take up to 10 minutes. Every time you start the app it performs a check to make sure that its data is current and in good health, if anything is off it re-ingests all the data from the state. Ideally you would redeploy the app once per quarter, on the first of the month, as that's when the new sales tax rates take effect.
 
-Outside of this process to download data from the state and the requirement that you expose it to the internet through a webserver (nginx, IIS) this app has no external dependencies. Because .NET 6 is multiplatform this project offers support for Windows and Linux. It may work on OS X, but this has not been tested.
+Outside of this process to download data from the state and the requirement that you expose it to the internet through a webserver (nginx, IIS) this app has no external dependencies. Because .NET 8 is multiplatform this project offers support for Windows and Linux. It may work on OS X, but this has not been tested.
 
 # How to use this API
 Read through our [Swagger docs](https://wataxlookup.acceleratenetworks.com/swagger/index.html) and make some test requests.
