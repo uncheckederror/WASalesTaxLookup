@@ -29,5 +29,5 @@ steps:
 - task: PublishPipelineArtifact@1
   inputs:
     artifactName: 'WASaleTax'
-    targetPath: '$(System.DefaultWorkingDirectory)/WASaleTax/bin/Release/net8.0/'
+    targetPath: '$(System.DefaultWorkingDirectory)/WASaleTax/bin/Release/net9.0/'
     publishLocation: 'pipeline'
