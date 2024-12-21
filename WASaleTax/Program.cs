@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using WASalesTax.Ingest;
+using WASalesTax.Models;
 using WASalesTax.Parsing;
 
 namespace WASalesTax
@@ -164,14 +165,11 @@ namespace WASalesTax
 
                     // Ingest the data into the SQLite database.
                     var checkRates = await DataSource
-                        .TryIngestTaxRatesAsync(ratesUrl, db)
-                        .ConfigureAwait(false);
+                        .TryIngestTaxRatesAsync(ratesUrl, db);
                     var checkZip = await DataSource
-                        .TryIngestShortZipCodesAsync(zipUrl, db)
-                        .ConfigureAwait(false);
+                        .TryIngestShortZipCodesAsync(zipUrl, db);
                     var checkAddresses = await DataSource
-                        .TryIngestAddressesAsync(addressUrl, db)
-                        .ConfigureAwait(false);
+                        .TryIngestAddressesAsync(addressUrl, db);
                     Log.Information("Data ingest complete.");
                 }
 

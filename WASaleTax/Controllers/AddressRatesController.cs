@@ -43,7 +43,7 @@ namespace WASalesTax.Controllers
             var response = new ContentResult();
 
             bool useXml = false;
-            if (output == "xml")
+            if (output is "xml")
             {
                 useXml = true;
             }
@@ -146,7 +146,7 @@ namespace WASalesTax.Controllers
                     }
 
                     // Fail fast if no address ranges for this zip can be found.
-                    if (relatedAddressRanges is null || !relatedAddressRanges.Any())
+                    if (relatedAddressRanges is null || relatedAddressRanges.Count == 0)
                     {
                         if (useXml)
                         {
@@ -297,7 +297,7 @@ namespace WASalesTax.Controllers
                         relatedAddressRanges = await _context.AddressRanges.Where(x => x.ZipCode == matchingZip.Zip).ToListAsync();
                     }
 
-                    if (relatedAddressRanges is null || !relatedAddressRanges.Any())
+                    if (relatedAddressRanges is null || relatedAddressRanges.Count == 0)
                     {
                         return BadRequest(new ProblemDetails { Status = 400, Detail = "Invalid ZIP Code. Please verify that the Zip code you submitted is real and formatted correctly.", Title = "Invalid ZIP Code" });
                     }

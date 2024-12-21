@@ -11,16 +11,13 @@ using System;
 using System.IO;
 using System.Reflection;
 
+using WASalesTax.Models;
+
 namespace WASalesTax
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -31,7 +28,7 @@ namespace WASalesTax
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
-            services.AddDbContext<WashingtonStateContext>(options =>
+            services.AddDbContextPool<WashingtonStateContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("WashingtonStateContext"));
             });

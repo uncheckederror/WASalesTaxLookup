@@ -120,7 +120,7 @@ namespace WASalesTax.Parsing
 
             Lex lexer = new(street);
 
-            List<AddressToken> tokens = new();
+            List<AddressToken> tokens = [];
             StringTable m_strtab = new();
 
             while (lexer.NextToken(out LexTokenType token) && token != LexTokenType.ADDRLEX_EOF)
@@ -295,10 +295,7 @@ namespace WASalesTax.Parsing
                     }
                 }
             }
-            if (Street == null)
-            {
-                Street = (tokens.Count > 1) ? tokens[1] : tokens[0];
-            }
+            Street ??= (tokens.Count > 1) ? tokens[1] : tokens[0];
             // scan for a house number
             for (int x = 0; x < tokens.Count; x++)
             {

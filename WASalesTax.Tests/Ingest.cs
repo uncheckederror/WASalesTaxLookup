@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
-using WASalesTax;
 using WASalesTax.Ingest;
+using WASalesTax.Models;
 using WASalesTax.Parsing;
 
 using Xunit;
@@ -139,9 +139,9 @@ namespace WASaleTax.Tests
                 }
             }
 
-            var checkRates = await DataSource.TryIngestTaxRatesAsync(ratesUrl, db).ConfigureAwait(false);
-            var checkZip = await DataSource.TryIngestShortZipCodesAsync(zipUrl, db).ConfigureAwait(false);
-            var checkAddresses = await DataSource.TryIngestAddressesAsync(addressUrl, db).ConfigureAwait(false);
+            var checkRates = await DataSource.TryIngestTaxRatesAsync(ratesUrl, db);
+            var checkZip = await DataSource.TryIngestShortZipCodesAsync(zipUrl, db);
+            var checkAddresses = await DataSource.TryIngestAddressesAsync(addressUrl, db);
 
             Assert.True(checkRates);
             Assert.True(checkZip);
