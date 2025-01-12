@@ -348,12 +348,7 @@ public static class Endpoints
             return TypedResults.BadRequest(new ProblemDetails() { Status = 400, Title = "Invalid streetAddress", Type = "Validation failure", Detail = "The streetAddress parameter is required and may not be blank, null, or whitespace." });
         }
 
-        //if (string.IsNullOrWhiteSpace(city))
-        //{
-        //    return TypedResults.BadRequest(new ProblemDetails() { Status = 400, Title = "Invalid city", Type = "Validation failure", Detail = "The city parameter is required and may not be blank, null, or whitespace." });
-        //}
-
-        // The ZIP code is optional in this geocoder, and no results are returned if they get the City name wrong. So we're not going to validate it.
+        // The ZIP code and city are optional in this geocoder, but you have to supply one or the other. So we're not going to validate either.
 
         var geocodeResponse = await AppSettings.ConnectionStrings.GeocodingServiceBaseURL
            .PostUrlEncodedAsync(new
