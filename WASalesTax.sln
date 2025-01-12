@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WASalesTax", "WASaleTax\WAS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WASalesTax.Tests", "WASalesTax.Tests\WASalesTax.Tests.csproj", "{55965C6C-F911-4DCC-A01A-7B1027ADA9FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTax", "SalesTax\SalesTax.csproj", "{7C511EAE-A688-4F55-A96F-EE7981340C1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{55965C6C-F911-4DCC-A01A-7B1027ADA9FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55965C6C-F911-4DCC-A01A-7B1027ADA9FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55965C6C-F911-4DCC-A01A-7B1027ADA9FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C511EAE-A688-4F55-A96F-EE7981340C1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C511EAE-A688-4F55-A96F-EE7981340C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C511EAE-A688-4F55-A96F-EE7981340C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C511EAE-A688-4F55-A96F-EE7981340C1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
