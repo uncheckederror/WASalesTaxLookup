@@ -21,9 +21,16 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.File("WAStateSalesTax.txt", rollingInterval: RollingInterval.Day)
+    // Enabled only for running locally or debugging.
+    //.WriteTo.Console()
+    .WriteTo.File("log.txt",
+    rollingInterval: RollingInterval.Day,
+    rollOnFileSizeLimit: true,
+    retainedFileCountLimit: 2,
+    retainedFileTimeLimit: TimeSpan.FromDays(3))
     .CreateLogger();
+
+Log.Information("The WA Sales Tax Rate Lookup API is starting up.");
 
 // Get the configuration keys
 var config = new ConfigurationBuilder()
@@ -58,6 +65,8 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+builder.Services.AddHttpContextAccessor();
+
 // Cache the OpenAPI document per https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0&tabs=visual-studio
 builder.Services.AddOutputCache(options =>
 {
@@ -71,22 +80,31 @@ var ingestRates = Task.Run(async () =>
     builder.Services.AddSingleton(rates);
 });
 
-var ingestZips = Task.Run(async () =>
+if (typedConfig.EnableLegacy)
 {
-    string zipsUrl = await DataSource.GetZipsURLAsync(typedConfig.ConnectionStrings.BaseDataUrl);
-    var zips = await DataSource.TryIngestShortZipCodesAsync(zipsUrl);
-    builder.Services.AddSingleton(zips);
-});
+    var ingestZips = Task.Run(async () =>
+    {
+        string zipsUrl = await DataSource.GetZipsURLAsync(typedConfig.ConnectionStrings.BaseDataUrl);
+        var zips = await DataSource.TryIngestShortZipCodesAsync(zipsUrl);
+        builder.Services.AddSingleton(zips);
+    });
 
-var ingestAddresses = Task.Run(async () =>
+    var ingestAddresses = Task.Run(async () =>
+    {
+        string addressUrl = await DataSource.GetAddressesURLAsync(typedConfig.ConnectionStrings.BaseDataUrl);
+        var addresses = await DataSource.TryIngestAddressesAsync(addressUrl);
+        builder.Services.AddSingleton(addresses);
+    });
+
+    // Broken into separte tasks and run in parallel to reduce the startup time of the app.
+    await Task.WhenAll(ingestRates, ingestZips, ingestAddresses);
+}
+else
 {
-    string addressUrl = await DataSource.GetAddressesURLAsync(typedConfig.ConnectionStrings.BaseDataUrl);
-    var addresses = await DataSource.TryIngestAddressesAsync(addressUrl);
-    builder.Services.AddSingleton(addresses);
-});
+    await ingestRates;
+}
 
-// Broken into separte tasks and run in parallel to reduce the startup time of the app.
-await Task.WhenAll(ingestRates, ingestZips, ingestAddresses);
+Log.Information("Ingest(s) completed.");
 
 var app = builder.Build();
 
@@ -111,11 +129,32 @@ app.MapGet("/GetTaxRate", Endpoints.GISLookupAsync)
     .WithSummary("Find a sales tax rate")
     .WithDescription("Get a tax rate for a specific address in Washington State. Supply a valid street address (no apt or unit numbers), city, and zip code and recieve a tax rate.");
 
-// Must keep for legacy compatiblity
-app.MapGet("/AddressRates.aspx", Endpoints.LegacyLookupAsync)
+if (typedConfig.EnableLegacy)
+{
+    // Must keep for legacy compatiblity with the State DOR's API.
+    app.MapGet("/AddressRates.aspx", Endpoints.LegacyLookupAsync)
     .CacheOutput()
     .WithSummary("Find a sales tax rate using the same API provided by the State of Washington's Department of Revenue.")
     .WithDescription("An exact match to the API endpoint offered by the State of Washington's Department of Revenue.");
+}
+
+// Exists only to preserve compatibility, not intened for new clients.
+app.MapGet("/AddressRates", Endpoints.GISLookupAsync)
+    .CacheOutput()
+    .ExcludeFromDescription();
+
+// Exists only to preserve compatibility, not intened for new clients.
+app.MapGet("/PreciseRate",
+    async ([FromServices] FrozenDictionary<int,
+    TaxRate> TaxRates,
+    [FromServices] AppSettings AppSettings,
+    int houseNumber, string streetName, string shortZipCode, string zipPlus4
+    ) =>
+    {
+        return await Endpoints.GISLookupAsync(TaxRates, AppSettings, $"{houseNumber} {streetName}", string.Empty, shortZipCode);
+    })
+    .CacheOutput()
+    .ExcludeFromDescription();
 
 // This sets the root of the app to the interactive docs, suppressed from the docs as it's purely for convenience.
 app.MapGet("/", () => TypedResults.LocalRedirect("/scalar/v1"))
@@ -126,10 +165,8 @@ app.MapGet("/", () => TypedResults.LocalRedirect("/scalar/v1"))
 
 app.Run();
 
-public partial class Program
-{
-
-}
+// Required to support the integration tests in the test project.
+public partial class Program { }
 
 public static class Endpoints
 {
@@ -168,17 +205,17 @@ public static class Endpoints
             switch (zip.Length)
             {
                 case 5:
-                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip) ?? new();
+                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip);
                     break;
                 case 9:
-                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip[..5]) ?? new();
+                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip[..5]);
                     break;
                 case 10:
                     zip = zip.Replace("-", string.Empty);
-                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip[..5]) ?? new();
+                    matchingZip = ZipCodes.FirstOrDefault(x => x.Zip == zip[..5]);
                     break;
                 default:
-                    matchingZip = new();
+                    matchingZip = new ShortZip("",0);
                     break;
             }
 
@@ -206,7 +243,7 @@ public static class Endpoints
                 if (useXml)
                 {
                     var relatedAddressRange = AddressRanges.Where(x => x.ZipCode == matchingZip.Zip).FirstOrDefault();
-                    await context.Response.WriteAsync(xmlStart + $"<response loccode=\"{rate.LocationCode}\" localrate=\"{rate.Local.ToString().TrimStart('0')}\" rate=\"{rate.Rate.ToString().TrimStart('0')}\" code=\"5\" xmlns=\"\"><addressline code=\"{rate.LocationCode}\" state=\"WA\" zip=\"{matchingZip.Zip}\" period=\"{Period.CurrentPeriod().PeriodLit}\" rta=\"{relatedAddressRange?.RTA}\" ptba=\"{relatedAddressRange?.PTBAName}\" cez=\"{relatedAddressRange?.CEZName}\" />{rate.ToXML()}</response>");
+                    await context.Response.WriteAsync(xmlStart + $"<response loccode=\"{rate.LocationCode}\" localrate=\"{rate.Local.ToString().TrimStart('0')}\" rate=\"{rate.Rate.ToString().TrimStart('0')}\" code=\"5\" xmlns=\"\"><addressline code=\"{rate.LocationCode}\" state=\"WA\" zip=\"{matchingZip.Zip}\" period=\"{Period.CurrentPeriod().PeriodLit}\" rta=\"{relatedAddressRange.RTA}\" ptba=\"{relatedAddressRange.PTBAName}\" cez=\"{relatedAddressRange.CEZName}\" />{rate.ToXML()}</response>");
                 }
                 else
                 {
@@ -266,7 +303,7 @@ public static class Endpoints
 
                     if (!string.IsNullOrWhiteSpace(parsedStreetAddress.Street.Lexum))
                     {
-                        AddressRange match = new();
+                        AddressRange match = default;
                         double score = -3;
                         double mscore;
 
@@ -302,15 +339,10 @@ public static class Endpoints
 
                             var check = int.TryParse(parsedStreetAddress.House.Lexum, out int houseNumber);
 
-                            if (check)
-                            {
-                                match.AddressRangeUpperBound = houseNumber;
-                                match.AddressRangeLowerBound = houseNumber;
-                            }
-
                             if (useXml)
                             {
-                                await context.Response.WriteAsync(xmlStart + $"<response loccode=\"{rate.LocationCode}\" localrate=\"{rate.Local.ToString().TrimStart('0')}\" rate=\"{rate.Rate.ToString().TrimStart('0')}\" code=\"2\" xmlns=\"\">{match.ToXML()}{rate.ToXML()}</response>");
+                                string addressRangeXML = check ? match.ToXML(houseNumber) : match.ToXML();
+                                await context.Response.WriteAsync(xmlStart + $"<response loccode=\"{rate.LocationCode}\" localrate=\"{rate.Local.ToString().TrimStart('0')}\" rate=\"{rate.Rate.ToString().TrimStart('0')}\" code=\"2\" xmlns=\"\">{addressRangeXML}{rate.ToXML()}</response>");
                             }
                             else
                             {
@@ -338,12 +370,12 @@ public static class Endpoints
     (
         [FromServices] FrozenDictionary<int, TaxRate> TaxRates,
         [FromServices] AppSettings AppSettings,
-        [Description("The house number and street name. For example '6500 Linderson Way' or '201 S Jackson St'.")] string streetAddress = "",
+        [Description("The house number and street name. For example '6500 Linderson Way' or '201 S Jackson St'. Please do not include unit, office, or apt numbers. Just the simple physical address.")] string addr = "",
         [Description("The city that the address exists within. For example 'Seattle' or 'Tumwater'. Optional only if a zip code has been provided.")] string city = "",
         [Description("The 5 digit zip code that the street address exists within. For example '98104' or '98501'. Optional only if a city has been provided.")] string zip = ""
     )
     {
-        if (string.IsNullOrWhiteSpace(streetAddress))
+        if (string.IsNullOrWhiteSpace(addr))
         {
             return TypedResults.BadRequest(new ProblemDetails() { Status = 400, Title = "Invalid streetAddress", Type = "Validation failure", Detail = "The streetAddress parameter is required and may not be blank, null, or whitespace." });
         }
@@ -353,7 +385,7 @@ public static class Endpoints
         var geocodeResponse = await AppSettings.ConnectionStrings.GeocodingServiceBaseURL
            .PostUrlEncodedAsync(new
            {
-               Address = streetAddress,
+               Address = addr,
                City = city,
                Postal = zip,
                matchOutOfRange = true,

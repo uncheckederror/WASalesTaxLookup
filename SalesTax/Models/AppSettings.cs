@@ -4,7 +4,7 @@
     public class AppSettings
     {
         public Connectionstrings ConnectionStrings { get; set; } = new();
-        public bool InMemory { get; set; } = false;
+        public bool EnableLegacy { get; set; } = false;
     }
 
     public class Connectionstrings

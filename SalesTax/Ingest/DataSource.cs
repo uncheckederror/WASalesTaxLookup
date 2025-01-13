@@ -1,8 +1,6 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
+﻿using Flurl.Http;
 
-using Flurl.Http;
+using nietras.SeparatedValues;
 
 using SalesTax.Models;
 using SalesTax.Parsing;
@@ -159,14 +157,15 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                //db.ChangeTracker.AutoDetectChangesEnabled = false;
-                using var reader = new StreamReader(pathToCSV);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                csv.Context.RegisterClassMap<AddressRangeMap>();
+                using var reader = Sep.New(',').Reader().FromFile(pathToCSV);
+                var header = reader.Header;
 
-                await foreach (var row in csv.GetRecordsAsync<AddressRange>())
+                foreach (var row in reader)
                 {
-                    addresses.Add(row);
+                    var local = new AddressRange(row["ADDR_LOW"].Parse<int>(), row["ADDR_HIGH"].Parse<int>(), row["ODD_EVEN"].Parse<char>(),
+                        row["STREET"].ToString(), row["ZIP"].ToString(), row["PLUS4"].ToString(), row["PERIOD"].ToString(),
+                        row["CODE"].Parse<int>(), row["RTA"].Parse<char>(), row["PTBA_NAME"].ToString(), row["CEZ_NAME"].ToString());
+                    addresses.Add(local);
                 }
             }
             catch (Exception ex)
@@ -204,13 +203,17 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var reader = new StreamReader(pathToCSV);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                csv.Context.RegisterClassMap<TaxRateMap>();
+                using var reader = Sep.New(',').Reader().FromFile(pathToCSV);
+                var header = reader.Header;
 
-                await foreach (var row in csv.GetRecordsAsync<TaxRate>())
+                foreach (var row in reader)
                 {
-                    rates.Add(row.LocationCode, row);
+                    var effDate = DateTime.ParseExact(row["Effective Date"].Span, "yyyyMMdd", CultureInfo.InvariantCulture);
+                    var expDate = DateTime.ParseExact(row["Expiration Date"].Span, "yyyyMMdd", CultureInfo.InvariantCulture);
+                    var local = new TaxRate(row["Name"].ToString(), row["Code"].Parse<int>(), row["State"].Parse<double>(),
+                        row["Local"].Parse<double>(), row["RTA"].Parse<double>(), row["Rate"].Parse<double>(),
+                        effDate, expDate);
+                    rates.Add(local.LocationCode, local);
                 }
             }
             catch (Exception ex)
@@ -250,18 +253,12 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    HasHeaderRecord = false,
-                    Delimiter = ","
-                };
-                using var reader = new StreamReader(pathToCSV);
-                using var csv = new CsvReader(reader, config);
-                csv.Context.RegisterClassMap<ShortZipMap>();
+                using var reader = Sep.New(',').Reader(o => o with { HasHeader = false }).FromFile(pathToCSV);
 
-                await foreach (var row in csv.GetRecordsAsync<ShortZip>())
+                foreach (var row in reader)
                 {
-                    zips.Add(row);
+                    var local = new ShortZip(row[0].ToString(), row[3].Parse<int>());
+                    zips.Add(local);
                 }
             }
             catch (Exception ex)
@@ -272,71 +269,6 @@ namespace SalesTax.Ingest
             }
 
             return zips.ToFrozenSet();
-        }
-
-        public class AddressRangeMap : ClassMap<AddressRange>
-        {
-            public AddressRangeMap()
-            {
-                Map(m => m.AddressRangeLowerBound).Name("ADDR_LOW");
-                Map(m => m.AddressRangeUpperBound).Name("ADDR_HIGH");
-                Map(m => m.OddOrEven).Name("ODD_EVEN");
-                Map(m => m.Street).Name("STREET");
-                Map(m => m.State).Name("STATE");
-                Map(m => m.ZipCode).Name("ZIP");
-                Map(m => m.ZipCodePlus4).Name("PLUS4");
-                Map(m => m.Period).Name("PERIOD");
-                Map(m => m.LocationCode).Name("CODE");
-                Map(m => m.RTA).Name("RTA");
-                Map(m => m.PTBAName).Name("PTBA_NAME");
-                Map(m => m.CEZName).Name("CEZ_NAME");
-            }
-        }
-
-        public class TaxRateMap : ClassMap<TaxRate>
-        {
-            public TaxRateMap()
-            {
-                Map(m => m.Name).Name("Name");
-                Map(m => m.LocationCode).Name("Code");
-                Map(m => m.State).Name("State");
-                Map(m => m.Local).Name("Local");
-                Map(m => m.RTA).Name("RTA");
-                Map(m => m.Rate).Name("Rate");
-                Map(m => m.EffectiveDate).Name("Effective Date").TypeConverter<DateTimeConverter<string>>();
-                Map(m => m.ExpirationDate).Name("Expiration Date").TypeConverter<DateTimeConverter<string>>();
-            }
-        }
-
-        public class ShortZipMap : ClassMap<ShortZip>
-        {
-            public ShortZipMap()
-            {
-                Map(m => m.Zip).Index(0);
-                Map(m => m.Plus4LowerBound).Index(1);
-                Map(m => m.Plus4UpperBound).Index(2);
-                Map(m => m.LocationCode).Index(3);
-                Map(m => m.State).Index(4);
-                Map(m => m.Local).Index(5);
-                Map(m => m.TotalRate).Index(6);
-                Map(m => m.EffectiveStartDate).Index(7).TypeConverter<DateTimeConverter<string>>();
-                Map(m => m.EffectiveEndDate).Index(8).TypeConverter<DateTimeConverter<string>>();
-            }
-        }
-
-        public class DateTimeConverter<T> : DefaultTypeConverter
-        {
-            public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
-            {
-                return DateTime.ParseExact(text,
-                                  "yyyyMMdd",
-                                   CultureInfo.InvariantCulture);
-            }
-
-            public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
-            {
-                return value.ToString();
-            }
         }
     }
 }

@@ -152,6 +152,38 @@ public class RemoteDependencies : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task GetZips()
+    {
+        var url = await DataSource.GetZipsURLAsync(configuration.ConnectionStrings.BaseDataUrl);
+
+        Assert.False(string.IsNullOrWhiteSpace(url));
+
+        var rates = await DataSource.TryIngestShortZipCodesAsync(url);
+
+        Assert.NotNull(rates);
+        Assert.True(rates.Count > 0);
+        output.WriteLine($"{url}");
+        output.WriteLine($"{rates.Count} Rates in Dict");
+        output.WriteLine(System.Text.Json.JsonSerializer.Serialize(rates.FirstOrDefault()));
+    }
+
+    [Fact]
+    public async Task GetAddresses()
+    {
+        var url = await DataSource.GetAddressesURLAsync(configuration.ConnectionStrings.BaseDataUrl);
+
+        Assert.False(string.IsNullOrWhiteSpace(url));
+
+        var rates = await DataSource.TryIngestAddressesAsync(url);
+
+        Assert.NotNull(rates);
+        Assert.True(rates.Count > 0);
+        output.WriteLine($"{url}");
+        output.WriteLine($"{rates.Count} Rates in Dict");
+        output.WriteLine(System.Text.Json.JsonSerializer.Serialize(rates.FirstOrDefault()));
+    }
+
+    [Fact]
     public async Task GetURLs()
     {
         var rate = await DataSource.GetTaxRatesURLAsync(configuration.ConnectionStrings.BaseDataUrl);
