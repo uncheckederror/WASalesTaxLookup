@@ -88,7 +88,7 @@ builder.Services.AddOpenApi(options =>
         {
             Title = "WA Sales Tax Lookup API",
             Version = "v1",
-            Description = $"Find the correct sales tax rate to apply to transactions in Washington State based on an address. If the transaction is happening in a physical location query for the tax rate using the street address of that location. If the transaction is happening online, query for the tax rate using the billing address provided by the customer in their order. \nLearn more about WA Sales Tax Rate Lookup URL Interface provided by the Washington State Department of Revenue here: https://dor.wa.gov/wa-sales-tax-rate-lookup-url-interface Review the source code for this project on Github: https://github.com/uncheckederror/WASalesTaxLookup Using the Tax Rates found at {urls.FirstOrDefault()}",
+            Description = $"Find the correct sales tax rate to apply to transactions in Washington State based on an address. If the transaction is happening in a physical location query for the tax rate using the street address of that location. If the transaction is happening online, query for the tax rate using the billing address provided by the customer in their order. \nLearn more about WA Sales Tax Rate Lookup URL Interface provided by the Washington State Department of Revenue here: https://dor.wa.gov/wa-sales-tax-rate-lookup-url-interface Review the source code for this project on Github: https://github.com/uncheckederror/WASalesTaxLookup The API responds with the Tax Rates found at {urls.FirstOrDefault()}",
             License = new()
             {
                 Url = new("https://github.com/uncheckederror/WASalesTaxLookup/blob/master/LICENSE"),
@@ -137,8 +137,8 @@ if (typedConfig.EnableLegacy)
     // Must keep for legacy compatiblity with the State DOR's API.
     app.MapGet("/AddressRates.aspx", Endpoints.LegacyLookupAsync)
     .CacheOutput()
-    .WithSummary("Find a sales tax rate using the same API provided by the State of Washington's Department of Revenue.")
-    .WithDescription("An exact match to the API endpoint offered by the State of Washington's Department of Revenue.");
+    .WithSummary("Find a sales tax rate using the same API provided by the State of Washington's Department of Revenue")
+    .WithDescription("An exact match to the existing API endpoint offered by the State of Washington's Department of Revenue.");
 }
 
 // Exists only to preserve compatibility, not intened for new clients.
