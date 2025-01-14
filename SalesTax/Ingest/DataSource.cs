@@ -157,7 +157,7 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var reader = Sep.New(',').Reader().FromFile(pathToCSV);
+                using var reader = Sep.New(',').Reader(o => o with { CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
                 var header = reader.Header;
 
                 foreach (var row in reader)
@@ -203,7 +203,7 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var reader = Sep.New(',').Reader().FromFile(pathToCSV);
+                using var reader = Sep.New(',').Reader(o => o with { CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
                 var header = reader.Header;
 
                 foreach (var row in reader)
@@ -253,7 +253,7 @@ namespace SalesTax.Ingest
                     ZipFile.ExtractToDirectory(pathtoFile, AppContext.BaseDirectory);
                 }
 
-                using var reader = Sep.New(',').Reader(o => o with { HasHeader = false }).FromFile(pathToCSV);
+                using var reader = Sep.New(',').Reader(o => o with { HasHeader = false, CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
 
                 foreach (var row in reader)
                 {
