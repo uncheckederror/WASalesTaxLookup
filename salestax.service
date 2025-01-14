@@ -1,0 +1,10 @@
+[Unit]
+Description=SalesTax
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/SalesTax
+ExecStart=/usr/bin/dotnet /var/www/SalesTax.dll
+
+[Install]
+WantedBy=multi-user.target
