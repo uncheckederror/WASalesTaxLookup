@@ -42,42 +42,14 @@ builder.Services.AddSingleton(typedConfig);
 
 builder.Services.AddProblemDetails();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi(options =>
-{
-    options.AddDocumentTransformer((document, context, cancellationToken) =>
-    {
-        document.Info = new()
-        {
-            Title = "WA Sales Tax Lookup API",
-            Version = "v1",
-            Description = "Find the correct sales tax rate to apply to transactions in Washington State based on an address. If the transaction is happening in a physical location query for the tax rate using the street address of that location. If the transaction is happening online, query for the tax rate using the billing address provided by the customer in their order. \nLearn more about WA Sales Tax Rate Lookup URL Interface provided by the Washington State Department of Revenue here: https://dor.wa.gov/wa-sales-tax-rate-lookup-url-interface Review the source code for this project on Github: https://github.com/uncheckederror/WASalesTaxLookup",
-            License = new()
-            {
-                Url = new("https://github.com/uncheckederror/WASalesTaxLookup/blob/master/LICENSE"),
-                Name = "GNU Affero General Public License v3.0"
-            },
-            Contact = new() { Name = "Thomas Ryan", Url = new("https://thomasryan.dev/") },
-            TermsOfService = new("https://github.com/uncheckederror/WASalesTaxLookup"),
-        };
-        return Task.CompletedTask;
-    });
-});
-
-builder.Services.AddHttpContextAccessor();
-
-// Cache the OpenAPI document per https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0&tabs=visual-studio
-builder.Services.AddOutputCache(options =>
-{
-    options.AddBasePolicy(policy => policy.Cache().Expire(TimeSpan.FromMinutes(10)));
-});
+List<string> urls = [];
 
 var ingestRates = Task.Run(async () =>
 {
     string ratesUrl = await DataSource.GetTaxRatesURLAsync(typedConfig.ConnectionStrings.BaseDataUrl);
     var rates = await DataSource.TryIngestTaxRatesAsync(ratesUrl);
     builder.Services.AddSingleton(rates);
+    urls.Add(ratesUrl);
 });
 
 if (typedConfig.EnableLegacy)
@@ -105,6 +77,37 @@ else
 }
 
 Log.Information("Ingest(s) completed.");
+
+// Add services to the container.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info = new()
+        {
+            Title = "WA Sales Tax Lookup API",
+            Version = "v1",
+            Description = $"Find the correct sales tax rate to apply to transactions in Washington State based on an address. If the transaction is happening in a physical location query for the tax rate using the street address of that location. If the transaction is happening online, query for the tax rate using the billing address provided by the customer in their order. \nLearn more about WA Sales Tax Rate Lookup URL Interface provided by the Washington State Department of Revenue here: https://dor.wa.gov/wa-sales-tax-rate-lookup-url-interface Review the source code for this project on Github: https://github.com/uncheckederror/WASalesTaxLookup Using the Tax Rates found at {urls.FirstOrDefault()}",
+            License = new()
+            {
+                Url = new("https://github.com/uncheckederror/WASalesTaxLookup/blob/master/LICENSE"),
+                Name = "GNU Affero General Public License v3.0"
+            },
+            Contact = new() { Name = "Thomas Ryan", Url = new("https://thomasryan.dev/") },
+            TermsOfService = new("https://github.com/uncheckederror/WASalesTaxLookup"),
+        };
+        return Task.CompletedTask;
+    });
+});
+
+builder.Services.AddHttpContextAccessor();
+
+// Cache the OpenAPI document per https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0&tabs=visual-studio
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(policy => policy.Cache().Expire(TimeSpan.FromMinutes(10)));
+});
 
 var app = builder.Build();
 
