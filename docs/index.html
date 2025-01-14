@@ -8,7 +8,7 @@
     <meta name="description"
         content="Lookup the Sales Tax rate for a specific address in Washington State using this standalone REST API.">
     <meta name="keywords"
-        content="Sales Tax, Lookup, Washington, State, WA, Tax, Sales, Checkout, Cart, Github, API, Government, REST, SQLLite, C#, .NET 5, Swagger">
+        content="Sales Tax, Lookup, Washington, State, WA, Tax, Sales, Checkout, Cart, Github, API, Government, REST, C#, .NET 9, Scalar">
     <meta name="author" content="Thomas August Ryan">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
@@ -34,8 +34,8 @@
                     </p>
                     <p class="">
                         <a class="button is-success is-large"
-                            href="https://wataxlookup.acceleratenetworks.com/swagger/index.html"
-                            title="Swagger Documentation">
+                            href="https://wataxlookup.acceleratenetworks.com/scalar/v1"
+                            title="Scalar Documentation">
                             <span class="icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                     aria-hidden="true" focusable="false" width="32" height="32"
@@ -54,14 +54,6 @@
                             </span>
                             <span>Try it out!</span>
                         </a>
-                        <!-- <a class="button is-link is-large" href="https://nightly.link/uncheckederror/WAParcels/workflows/dotnet/master/artifact.zip" title="~700 MBs">
-                            <span class="icon">
-                                <svg viewBox="0 0 16 16" version="1.1" width="32" height="32" aria-hidden="true">
-                                    <path style="fill:white" fill-rule="evenodd" d="M7.47 10.78a.75.75 0 001.06 0l3.75-3.75a.75.75 0 00-1.06-1.06L8.75 8.44V1.75a.75.75 0 00-1.5 0v6.69L4.78 5.97a.75.75 0 00-1.06 1.06l3.75 3.75zM3.75 13a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5z"></path>
-                                </svg>
-                            </span>
-                            <span>Download</span>
-                        </a> -->
                         <a class="button is-large" href="https://github.com/uncheckederror/WASalesTaxLookup"
                             title="Get the source code">
                             <span class="icon">
@@ -79,7 +71,7 @@
                             <div class="box mt-4 content is-normal">
                                 <p>
                                     Based on the API provided by the <a
-                                        href="https://dor.wa.gov/taxes-rates/retail-sales-tax/destination-based-sales-tax-and-streamlined-sales-tax/wa-sales-tax-rate-lookup-url-interface"
+                                        href="https://dor.wa.gov/wa-sales-tax-rate-lookup-url-interface"
                                         target="_blank" class="has-text-link">Washington State Department of Revenue</a>, WA Sales
                                     Tax
                                     Lookup, implements an identical API that responds in plain text or XML and a modern
@@ -92,13 +84,9 @@
                                     which happens on start up, you're good to go until the next quarter. When the state updates the sale tax rates the app will automatically ingest the new data.
                                 </p>
                                 <p>
-                                    Built for high reliability and performance WA Sales Tax Lookup is a <a
-                                        href="https://dotnet.microsoft.com/apps/aspnet/apis" target="_blank" class="has-text-link">.NET 9 Web
-                                        API</a>
-                                    project backed with an <a href="https://www.sqlite.org/index.html"
-                                        target="_blank" class="has-text-link">SQLite</a> database that implements the OpenAPI standard and
-                                    offers
-                                    friendly <a href="https://swagger.io/tools/swagger-ui/" target="_blank" class="has-text-link">Swagger UI</a> documentation to make integrating with it a breeze. 🚀
+                                    Built for reliability, ease-of-use and performance WA Sales Tax Lookup is a <a
+                                        href="https://dotnet.microsoft.com/apps/aspnet/apis" target="_blank" class="has-text-link">.NET 9 Minimal API</a> project that offers
+                                    friendly <a href="https://github.com/scalar/scalar" target="_blank" class="has-text-link">Scalar</a> documentation to make integrating with it a breeze. 🚀
                                 </p>
                             </div>
                         </div>
