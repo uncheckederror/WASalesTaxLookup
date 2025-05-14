@@ -158,15 +158,15 @@ namespace SalesTax.Ingest
                 }
 
                 using var reader = Sep.New(',').Reader(o => o with { CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
-                var header = reader.Header;
 
-                foreach (var row in reader)
+                addresses = [.. reader.ParallelEnumerate((SepReader.Row row, out AddressRange range) =>
                 {
-                    var local = new AddressRange(row["ADDR_LOW"].Parse<int>(), row["ADDR_HIGH"].Parse<int>(), row["ODD_EVEN"].Parse<char>(),
+                    range = new AddressRange(row["ADDR_LOW"].Parse<int>(), row["ADDR_HIGH"].Parse<int>(), row["ODD_EVEN"].Parse<char>(),
                         row["STREET"].ToString(), row["ZIP"].ToString(), row["PLUS4"].ToString(), row["PERIOD"].ToString(),
                         row["CODE"].Parse<int>(), row["RTA"].Parse<char>(), row["PTBA_NAME"].ToString(), row["CEZ_NAME"].ToString());
-                    addresses.Add(local);
-                }
+                    return true;
+                })];
+
             }
             catch (Exception ex)
             {
@@ -204,17 +204,16 @@ namespace SalesTax.Ingest
                 }
 
                 using var reader = Sep.New(',').Reader(o => o with { CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
-                var header = reader.Header;
 
-                foreach (var row in reader)
+                rates = reader.ParallelEnumerate((SepReader.Row row, out (int key, TaxRate rate) kv) =>
                 {
                     var effDate = DateTime.ParseExact(row["Effective Date"].Span, "yyyyMMdd", CultureInfo.InvariantCulture);
                     var expDate = DateTime.ParseExact(row["Expiration Date"].Span, "yyyyMMdd", CultureInfo.InvariantCulture);
-                    var local = new TaxRate(row["Name"].ToString(), row["Code"].Parse<int>(), row["State"].Parse<double>(),
-                        row["Local"].Parse<double>(), row["RTA"].Parse<double>(), row["Rate"].Parse<double>(),
-                        effDate, expDate);
-                    rates.Add(local.LocationCode, local);
-                }
+                    var rate = new TaxRate(row["Name"].ToString(), row["Code"].Parse<int>(), row["State"].Parse<double>(),
+                        row["Local"].Parse<double>(), row["RTA"].Parse<double>(), row["Rate"].Parse<double>(), effDate, expDate);
+                    kv = (rate.LocationCode, rate);
+                    return true;
+                }).ToDictionary();
             }
             catch (Exception ex)
             {
@@ -255,11 +254,11 @@ namespace SalesTax.Ingest
 
                 using var reader = Sep.New(',').Reader(o => o with { HasHeader = false, CreateToString = SepToString.PoolPerCol() }).FromFile(pathToCSV);
 
-                foreach (var row in reader)
+                zips = [.. reader.ParallelEnumerate((SepReader.Row row, out ShortZip local) =>
                 {
-                    var local = new ShortZip(row[0].ToString(), row[3].Parse<int>());
-                    zips.Add(local);
-                }
+                    local = new ShortZip(row[0].ToString(), row[3].Parse<int>());
+                    return true;
+                })];
             }
             catch (Exception ex)
             {
