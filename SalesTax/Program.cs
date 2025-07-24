@@ -2,6 +2,7 @@ using Flurl.Http;
 
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 using SalesTax.Ingest;
 using SalesTax.Models;
@@ -97,6 +98,8 @@ builder.Services.AddOpenApi(options =>
             Contact = new() { Name = "Thomas Ryan", Url = new("https://thomasryan.dev/") },
             TermsOfService = new("https://github.com/uncheckederror/WASalesTaxLookup"),
         };
+        // https://github.com/scalar/scalar/discussions/4468
+        document.Servers = [];
         return Task.CompletedTask;
     });
 });
