@@ -7,7 +7,7 @@ namespace WASalesTax.Parsing
     /// </summary>
     public class Lexicon
     {
-        public Dictionary<string, string> dictionary = new();
+        public Dictionary<string, string> dictionary = [];
 
         public static Lexicon GetLexicon(string[] txt)
         {
@@ -22,7 +22,7 @@ namespace WASalesTax.Parsing
 
         public string Substitute(string str)
         {
-            return dictionary.ContainsKey(str) ? dictionary[str] : null;
+            return dictionary.TryGetValue(str, out string value) ? value : null;
         }
 
         public bool Contains(string str)
@@ -30,7 +30,7 @@ namespace WASalesTax.Parsing
             return dictionary.ContainsKey(str);
         }
 
-        public static readonly string[] LexiconNormalDirectional = new string[] {
+        public static readonly string[] LexiconNormalDirectional = [
             "N", "N",
             "W", "W",
             "S", "S",
@@ -39,9 +39,9 @@ namespace WASalesTax.Parsing
             "NE", "NE",
             "SW", "SW",
             "SE", "SE"
-        };
+        ];
 
-        public static readonly string[] LexiconDirectional = new string[] {
+        public static readonly string[] LexiconDirectional = [
             "N", "N",
             "W", "W",
             "S", "S",
@@ -59,9 +59,9 @@ namespace WASalesTax.Parsing
             "SOUTHWEST", "SW",
             "SOUTHEAST", "SE",
             "SO", "S"
-        };
+        ];
 
-        public static readonly string[] LexiconCommonRoads = new string[] {
+        public static readonly string[] LexiconCommonRoads = [
             "AV","AVE",
             "AVE","AVE",
             "AVENE","AVE",
@@ -156,10 +156,10 @@ namespace WASalesTax.Parsing
             "VSTA","VIS",
             "WAY","WAY",
             "WY","WAY"
-        };
+        ];
 
 
-        public static readonly string[] LexiconUspsAbbr = new string[] {
+        public static readonly string[] LexiconUspsAbbr = [
             "ALLEE","ALY",
             "ALLEY","ALY",
             "ALLY","ALY",
@@ -689,9 +689,9 @@ namespace WASalesTax.Parsing
             "WELL","WL",
             "WELLS","WLS",
             "WLS","WLS"
-        };
+        ];
 
-        public static readonly string[] LexiconSecondaryUnit = new string[] {
+        public static readonly string[] LexiconSecondaryUnit = [
             "APARTMENT","APT",
             "APT","APT",
             "BASEMENT","BSMT",
@@ -731,9 +731,9 @@ namespace WASalesTax.Parsing
             "UNIT","UNIT",
             "UPPER","UPPR",
             "UPPR","UPPR"
-        };
+        ];
 
-        public static readonly string[] LexiconOrdinalWord = new string[] {
+        public static readonly string[] LexiconOrdinalWord = [
             "FIRST", "1ST",
             "SECOND", "2ND",
             "THIRD", "3RD",
@@ -744,6 +744,6 @@ namespace WASalesTax.Parsing
             "EIGHTH", "8TH",
             "NINETH", "9TH",
             "TENTH", "10TH"
-        };
+        ];
     }
 }

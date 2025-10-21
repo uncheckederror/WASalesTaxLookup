@@ -16,7 +16,7 @@ namespace SalesTax.Parsing
                 Strings.Add(hash, new List<string>());
             }
             List<string> lst = Strings[hash];
-            string str = null;
+            string? str = null;
             if (ListContains(lst, sb, ref str))
             {
                 return str;

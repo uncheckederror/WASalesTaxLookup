@@ -6,16 +6,17 @@ namespace WASalesTax.Parsing
 {
     public class StringTable
     {
-        public Dictionary<int, List<string>> Strings = new();
+        public Dictionary<int, List<string>> Strings = [];
 
         public string Get(StringBuilder sb)
         {
             int hash = Hash(sb);
-            if (!Strings.ContainsKey(hash))
+            if (!Strings.TryGetValue(hash, out List<string> lst))
             {
-                Strings.Add(hash, new List<string>());
+                lst = new List<string>();
+                Strings.Add(hash, lst);
             }
-            List<string> lst = Strings[hash];
+
             string str = null;
             if (ListContains(lst, sb, ref str))
             {

@@ -5,7 +5,7 @@ namespace SalesTax.Parsing
     /// </summary>
     public class Lexicon
     {
-        public Dictionary<string, string> dictionary = new();
+        public Dictionary<string, string> dictionary = [];
 
         public static Lexicon GetLexicon(string[] txt)
         {
@@ -18,9 +18,9 @@ namespace SalesTax.Parsing
             return new Lexicon { dictionary = dict };
         }
 
-        public string Substitute(string str)
+        public string? Substitute(string str)
         {
-            return dictionary.ContainsKey(str) ? dictionary[str] : null;
+            return dictionary.TryGetValue(str, out string? value) ? value : null;
         }
 
         public bool Contains(string str)
@@ -28,7 +28,7 @@ namespace SalesTax.Parsing
             return dictionary.ContainsKey(str);
         }
 
-        public static readonly string[] LexiconNormalDirectional = new string[] {
+        public static readonly string[] LexiconNormalDirectional = [
             "N", "N",
             "W", "W",
             "S", "S",
@@ -37,9 +37,9 @@ namespace SalesTax.Parsing
             "NE", "NE",
             "SW", "SW",
             "SE", "SE"
-        };
+        ];
 
-        public static readonly string[] LexiconDirectional = new string[] {
+        public static readonly string[] LexiconDirectional = [
             "N", "N",
             "W", "W",
             "S", "S",
@@ -57,9 +57,9 @@ namespace SalesTax.Parsing
             "SOUTHWEST", "SW",
             "SOUTHEAST", "SE",
             "SO", "S"
-        };
+        ];
 
-        public static readonly string[] LexiconCommonRoads = new string[] {
+        public static readonly string[] LexiconCommonRoads = [
             "AV","AVE",
             "AVE","AVE",
             "AVENE","AVE",
@@ -154,10 +154,10 @@ namespace SalesTax.Parsing
             "VSTA","VIS",
             "WAY","WAY",
             "WY","WAY"
-        };
+        ];
 
 
-        public static readonly string[] LexiconUspsAbbr = new string[] {
+        public static readonly string[] LexiconUspsAbbr = [
             "ALLEE","ALY",
             "ALLEY","ALY",
             "ALLY","ALY",
@@ -687,9 +687,9 @@ namespace SalesTax.Parsing
             "WELL","WL",
             "WELLS","WLS",
             "WLS","WLS"
-        };
+        ];
 
-        public static readonly string[] LexiconSecondaryUnit = new string[] {
+        public static readonly string[] LexiconSecondaryUnit = [
             "APARTMENT","APT",
             "APT","APT",
             "BASEMENT","BSMT",
@@ -729,9 +729,9 @@ namespace SalesTax.Parsing
             "UNIT","UNIT",
             "UPPER","UPPR",
             "UPPR","UPPR"
-        };
+        ];
 
-        public static readonly string[] LexiconOrdinalWord = new string[] {
+        public static readonly string[] LexiconOrdinalWord = [
             "FIRST", "1ST",
             "SECOND", "2ND",
             "THIRD", "3RD",
@@ -742,6 +742,6 @@ namespace SalesTax.Parsing
             "EIGHTH", "8TH",
             "NINETH", "9TH",
             "TENTH", "10TH"
-        };
+        ];
     }
 }

@@ -36,7 +36,7 @@ namespace SalesTax.Ingest
                     var pathtoFile = await ratesUrl.DownloadFileAsync(AppContext.BaseDirectory);
                     ratesUrlInvalid = false;
                 }
-                catch (FlurlHttpException ex)
+                catch (FlurlHttpException)
                 {
                     if (month > 0 && year >= period.Year - 2)
                     {
@@ -74,7 +74,7 @@ namespace SalesTax.Ingest
                     var pathtoFile = await zipUrl.DownloadFileAsync(AppContext.BaseDirectory);
                     zipUrlInvalid = false;
                 }
-                catch (FlurlHttpException ex)
+                catch
                 {
                     if (month > 0 && year >= period.Year - 2)
                     {
@@ -112,7 +112,7 @@ namespace SalesTax.Ingest
                     var pathtoFile = await addressUrl.DownloadFileAsync(AppContext.BaseDirectory);
                     addressUrlInvalid = false;
                 }
-                catch (FlurlHttpException ex)
+                catch
                 {
                     if (month > 0 && year >= period.Year - 2)
                     {

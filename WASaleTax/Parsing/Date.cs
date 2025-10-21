@@ -21,7 +21,8 @@ namespace WASalesTax.Parsing
 
             if (year < 1900 || month <= 0 || month > 12 || day <= 0 || day > 31)
             {
-                throw new ArgumentOutOfRangeException("Date", "Invalid date (" + month + "/" + day + "/" + year + ")");
+                ArgumentOutOfRangeException argumentOutOfRangeException = new("Date", "Invalid date (" + month + "/" + day + "/" + year + ")");
+                throw argumentOutOfRangeException;
             }
             Year = year;
             Month = month;

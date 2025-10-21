@@ -2,7 +2,6 @@ using Flurl.Http;
 
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 using SalesTax.Ingest;
 using SalesTax.Models;
