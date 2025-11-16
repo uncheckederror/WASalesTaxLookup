@@ -151,18 +151,18 @@ namespace SalesTax.Parsing
 
         public static bool operator ==(Period p1, Period p2)
         {
-            if (null == (object)p1)
+            if (p1 is null)
             {
-                return null == (object)p2;
+                return p2 is null;
             }
             return p1.Equals(p2);
         }
 
         public static bool operator !=(Period p1, Period p2)
         {
-            if (null == (object)p1)
+            if (p1 is null)
             {
-                return null != (object)p2;
+                return p2 is not null;
             }
             return !p1.Equals(p2);
         }

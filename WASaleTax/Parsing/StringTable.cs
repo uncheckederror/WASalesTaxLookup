@@ -13,7 +13,7 @@ namespace WASalesTax.Parsing
             int hash = Hash(sb);
             if (!Strings.TryGetValue(hash, out List<string> lst))
             {
-                lst = new List<string>();
+                lst = [];
                 Strings.Add(hash, lst);
             }
 
